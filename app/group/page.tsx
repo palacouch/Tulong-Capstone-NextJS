@@ -132,8 +132,10 @@ export default function GroupScreen() {
     try {
       const groupQuery = query(collection(db, "groups"), where("joinCode", "==", joinCode.trim().toUpperCase()));
       const groupSnap = await getDocs(groupQuery);
-      if (groupSnap.empty) return; // Silent failure if code is wrong
-      
+      if (groupSnap.empty) {
+        alert('Invalid Join Code. Please try again.');
+        return;
+      }
       const groupId = groupSnap.docs[0].id;
       await setDoc(doc(db, "groups", groupId, "members", user.id), {
         userId: user.id, name: myName, status: "Available", isCreator: false,

@@ -25,7 +25,7 @@ export default function AddContactScreen() {
     }
     setLoading(true);
     try {
-      await addDoc(collection(db, "users", user!.id, "contacts"), {
+      await addDoc(collection(db, "users", user!.uid, "contacts"), {
         name: name.trim(),
         phone: phone.trim(),
         relationship,
@@ -34,6 +34,7 @@ export default function AddContactScreen() {
       router.back();
     } catch (e) {
       console.error(e);
+      alert('Failed to save contact. Please try again.');
     } finally {
       setLoading(false);
     }

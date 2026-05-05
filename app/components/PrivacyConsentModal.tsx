@@ -36,10 +36,10 @@ export default function PrivacyConsentModal() {
     if (!user) return;
     setLoading(true);
     try {
-      await setDoc(doc(db, "users", user.id, "consent", "privacy"), {
+      await setDoc(doc(db, "users", user.uid, "consent", "privacy"), {
         consentGiven: true,
         consentDate: serverTimestamp(),
-        userId: user.id,
+        userId: user.uid,
         version: "1.0",
         platform: "web",
       });
@@ -47,7 +47,9 @@ export default function PrivacyConsentModal() {
       localStorage.setItem("tulong_privacy_consent", "true");
       setVisible(false);
     } catch (e) {
-    
+      console.error(e);
+      alert('Failed to save consent. Please check your connection and try again.');
+
     } finally {
       setLoading(false);
     }
