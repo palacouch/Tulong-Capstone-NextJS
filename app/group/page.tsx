@@ -13,10 +13,10 @@ import {
 } from "firebase/firestore";
 
 const QUICK_STATUSES = [
-  { key: "responded", icon: "👋", label: "Responded", text: "I have responded to the alert.", color: "#6366f1" },
-  { key: "on_the_way", icon: "🚗", label: "On the way", text: "I am on the way to the wearer.", color: "#fb923c" },
-  { key: "arrived", icon: "📍", label: "Arrived", text: "I have arrived at the wearer's location.", color: "#378ADD" },
-  { key: "aided", icon: "✅", label: "Wearer aided", text: "I have aided the wearer. All clear.", color: "#4ade80" },
+  { key: 'responded', icon: "👋", label: 'Responded', text: 'I have responded to the alert.', color: '#6366f1' },
+  { key: 'on_the_way', icon: "🚗", label: 'On the way', text: 'I am on the way to the wearer.', color: '#fb923c' },
+  { key: 'arrived', icon: "📍", label: 'Arrived', text: 'I have arrived at the wearer's location.'', color: '#378ADD' },
+  { key: 'aided', icon: "✅", label: 'Wearer aided', text: 'I have aided the wearer. All clear.', color: '#4ade80' },
 ];
 
 function getDistanceKm(lat1, lon1, lat2, lon2) {

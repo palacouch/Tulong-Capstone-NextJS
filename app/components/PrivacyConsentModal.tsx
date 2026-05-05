@@ -16,7 +16,7 @@ export default function PrivacyConsentModal() {
   useEffect(() => {
     // This logic ensures the modal only shows if it's their first time!
     const checkConsent = () => {
-      const localConsent = localStorage.getItem("tulong_privacy_consent");
+      const localConsent = localStorage.getItem('tulong_privacy_consent');
       if (!localConsent) {
         setVisible(true);
       }
@@ -40,8 +40,8 @@ export default function PrivacyConsentModal() {
         consentGiven: true,
         consentDate: serverTimestamp(),
         userId: user.id,
-        version: "1.0",
-        platform: "web",
+        version: '1.0',
+        platform: 'web',
       });
       // Save to local storage so it never shows on this device again
       localStorage.setItem("tulong_privacy_consent", "true");

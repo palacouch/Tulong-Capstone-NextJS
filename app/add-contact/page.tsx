@@ -17,7 +17,7 @@ export default function AddContactScreen() {
   const [relationship, setRelationship] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const relationships = ["Mother", "Father", "Sibling", "Friend", "Partner"];
+  const relationships = ['Mother', 'Father', 'Sibling', 'Friend', 'Partner'];
 
   const handleSave = async () => {
     if (!name || !phone || !relationship) {
@@ -25,7 +25,7 @@ export default function AddContactScreen() {
     }
     setLoading(true);
     try {
-      await addDoc(collection(db, "users", user!.id, "contacts"), {
+      await addDoc(collection(db, 'users', user!.id, 'contacts'), {
         name: name.trim(),
         phone: phone.trim(),
         relationship,
