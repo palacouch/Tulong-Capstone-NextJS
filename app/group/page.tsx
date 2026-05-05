@@ -1,10 +1,5 @@
 "use client";
-
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../config/firebase";
 import { useAuth } from "../../context/authContext";
 import {
