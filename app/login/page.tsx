@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
@@ -26,12 +27,30 @@ export default function LoginPage() {
 
     try {
       // 🔐 Firebase login
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const userRole = userData.role;
+        
 
       // ✅ IMPORTANT: wait a tick so auth state updates
       setTimeout(() => {
-        router.push("/dashboard");
+        if (userRole == "admin") {
+          router.push("/admin");
+        } else if (userRole == "user") {
+          router.push("/dashboard");
+        } 
       }, 300);
+
+    } else {
+      setError("User profile not found in database.");
+      // Sign them back out if they have an account but no database entry
+      await auth.signOut(); 
+    }
 
     } catch (err: any) {
       setError("Invalid email or password.");
