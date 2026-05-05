@@ -3,8 +3,18 @@ import { adminAuth, adminDb } from "../../lib/firebaseAdmin";
 
 export async function GET() {
   try {
+    console.log("--- ENV CHECK ---");
+  console.log("API KEY:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? "Found" : "Missing");
+  console.log("PRIVATE KEY:", process.env.FIREBASE_PRIVATE_KEY ? "Found" : "Missing");
+
+  const key = process.env.FIREBASE_PRIVATE_KEY || "";
+    console.log("--- KEY INSPECTION ---");
+    console.log("STARTS WITH:", key.substring(0, 30));
+    console.log("ENDS WITH:", key.slice(-30));
+    console.log("INCLUDES \\n?", key.includes('\\n') ? "Yes" : "No");
     // 1. Fetch all users using Firebase Admin
     const listUsersResult = await adminAuth.listUsers(1000);
+    console.log("Auth users found:", listUsersResult.users.length);
     
     // 2. Loop through the users and grab their "name" from Firestore
     const users = await Promise.all(
@@ -14,6 +24,7 @@ export async function GET() {
         try {
           // Look up the specific user document in the "users" collection
           const userDoc = await adminDb.collection("users").doc(user.uid).get();
+          console.log("Firestore documents found:", userDoc.size);
           
           if (userDoc.exists) {
             // Grab the "name" field from your Firestore document
