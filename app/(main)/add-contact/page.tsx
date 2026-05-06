@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { addDoc, collection, serverTimestamp, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { useAuth } from "../context/AuthContext";
+import { db } from "../../../config/firebase";
+import { useAuth } from "../../context/AuthContext";
 
 export default function AddContactScreen() {
   const { user } = useAuth();
