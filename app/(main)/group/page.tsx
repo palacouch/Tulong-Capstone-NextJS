@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { db } from "../../config/firebase";
-import { useAuth } from "../../context/authContext";
+import { db } from "../../../config/firebase";
+import { useAuth } from "../../context/AuthContext"; 
 import {
   addDoc, collection, doc, getDoc, getDocs, limit, onSnapshot,
   orderBy, query, serverTimestamp, setDoc, updateDoc, where

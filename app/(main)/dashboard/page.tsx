@@ -11,11 +11,11 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-import { db } from "../lib/firebase";
-import { useAuth } from "../context/AuthContext";
+import { db } from "../../lib/firebase";
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PrivacyConsentModal from "../components/PrivacyConsentModal";
+import PrivacyConsentModal from "../../components/PrivacyConsentModal";
 
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 
