@@ -163,12 +163,6 @@ export default function GroupScreen() {
   
       <div className="absolute inset-0 bg-blue-50 animate-pulse -z-10 opacity-50 pointer-events-none"></div>
 
-      <div className="absolute top-4 right-4 z-50">
-        <button onClick={() => {}} className="text-xs text-red-500 underline cursor-pointer">
-          Delete Account & Data
-        </button>
-      </div>
-
       {!group ? (
         <div className="flex flex-col items-center justify-center flex-grow p-8 space-y-6">
           <span className="text-6xl">👥</span>
