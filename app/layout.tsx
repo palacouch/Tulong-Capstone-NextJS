@@ -1,8 +1,9 @@
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
+import { Metadata } from "next";
 
-export const metadata = {
-  title: "Tulong 🚨",
+export const metadata: Metadata = {
+  title: "C.A.R.E",
   description: "Emergency Alert System",
 };
 
