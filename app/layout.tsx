@@ -3,8 +3,11 @@ import { AuthProvider } from "./context/AuthContext";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "C.A.R.E",
-  description: "Emergency Alert System",
+title: {
+template: 'C.A.R.E | %s',
+default: 'C.A.R.E',
+},
+description: "Emergency Alert System",
 };
 
 export default function RootLayout({
