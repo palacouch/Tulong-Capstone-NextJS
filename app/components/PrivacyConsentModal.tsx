@@ -106,15 +106,6 @@ export default function PrivacyConsentModal() {
             emergency contacts you designate.
           </p>
 
-          <div className="mt-4 p-4 bg-white/5 rounded-lg flex flex-col gap-3">
-            <button onClick={() => {}} className="text-[12px] text-blue-400 underline text-left">
-              Download Full Legal Document (PDF)
-            </button>
-            <button onClick={() => {}} className="text-[12px] text-red-500 underline text-left">
-              Request Permanent Data Deletion
-            </button>
-          </div>
-
           <div className="mt-4 p-3 bg-indigo-500/10 rounded-lg text-center">
             <p className="text-white/35 text-[12px]">
               {scrolled ? "✓ You have read the full notice" : "Scroll down to read the full notice"}
