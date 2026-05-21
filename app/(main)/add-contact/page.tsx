@@ -8,6 +8,14 @@ import { addDoc, collection, serverTimestamp, getDocs, query, where } from "fire
 import { db } from "../../../config/firebase";
 import { useAuth } from "../../context/AuthContext";
 
+// 1. Define the TypeScript interface for our multi-field error states
+interface FormErrors {
+  name?: string;
+  phone?: string;
+  relationship?: string;
+  general?: string;
+}
+
 export default function AddContactScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -16,13 +24,41 @@ export default function AddContactScreen() {
   const [phone, setPhone] = useState("");
   const [relationship, setRelationship] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const relationships = ["Mother", "Father", "Sibling", "Friend", "Partner"];
 
-  const handleSave = async () => {
-    if (!name || !phone || !relationship) {
-      return;
+  const validateForm = (): boolean => {
+    const tempErrors: FormErrors = {};
+    
+    // Numeric verification for phone string (allowing spaces, hyphens, and +)
+    const phoneRegex = /^[+]?[0-9\s\-]{7,15}$/;
+
+    if (!name.trim()) {
+      tempErrors.name = "Full name is required.";
+    } else if (name.trim().length < 2) {
+      tempErrors.name = "Name must be at least 2 characters long.";
     }
+
+    if (!phone.trim()) {
+      tempErrors.phone = "Phone number is required.";
+    } else if (!phoneRegex.test(phone.trim())) {
+      tempErrors.phone = "Please enter a valid phone number (e.g., +1234567890).";
+    }
+
+    if (!relationship) {
+      tempErrors.relationship = "Please select a relationship type.";
+    }
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    setErrors({});
+
+    if (!validateForm()) return;
+
     setLoading(true);
     try {
       await addDoc(collection(db, "users", user!.uid, "contacts"), {
@@ -34,7 +70,7 @@ export default function AddContactScreen() {
       router.back();
     } catch (e) {
       console.error(e);
-      alert('Failed to save contact. Please try again.');
+      setErrors({ general: "Failed to save contact due to a network error. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -67,35 +103,82 @@ export default function AddContactScreen() {
           Import from Google Contacts
         </button>
 
-        <span className="text-[11px] font-bold text-gray-300 tracking-widest mb-2 uppercase">Full Name</span>
-        <div className="flex items-center h-14 rounded-xl border border-gray-200 bg-gray-50 px-4 mb-6">
+        {/* Global Firestore/Network Error Message Banner */}
+        {errors.general && (
+          <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl mb-6 text-sm flex items-start gap-2">
+            <span className="shrink-0">⚠️</span>
+            <span>{errors.general}</span>
+          </div>
+        )}
+
+        {/* Full Name Input Box Container */}
+        <div className="flex flex-col mb-6">
+        <span className={`text-[11px] font-bold tracking-widest mb-2 uppercase ${errors.name ? "text-red-500" : "text-gray-400"}`}>
+          Full Name
+        </span>
+        <div className={`flex items-center h-14 rounded-xl border px-4 transition-colors duration-200 ${
+            errors.name ? "border-red-500 bg-red-50/20" : "border-gray-200 bg-gray-50 focus-within:border-black"
+          }`}>
           <input
             className="flex-1 bg-transparent text-black text-lg font-medium outline-none placeholder-gray-400"
-            placeholder=""
+            placeholder="e.g. John Doe"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name) setErrors((prev) => ({ ...prev, name: undefined })); // Real-time erasure
+              }}
+              aria-invalid={!!errors.name}
           />
         </div>
+        {errors.name && (
+            <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1">
+              <span>🛑</span> {errors.name}
+            </p>
+          )}
+        </div>
 
-        <span className="text-[11px] font-bold text-gray-300 tracking-widest mb-2 uppercase">Phone Number</span>
-        <div className="flex items-center h-14 rounded-xl border border-gray-200 bg-gray-50 px-4 mb-6">
+        {/* Phone Number Input Box Container */}
+        <div className="flex flex-col mb-6"></div>
+        <span className="flex flex-col mb-6">
+          Phone Number
+        </span>
+        <div className={`flex items-center h-14 rounded-xl border px-4 transition-colors duration-200 ${
+            errors.phone ? "border-red-500 bg-red-50/20" : "border-gray-200 bg-gray-50 focus-within:border-black"
+          }`}>
           <input
             className="flex-1 bg-transparent text-black text-lg font-medium outline-none placeholder-gray-400"
-            placeholder=""
+            placeholder="e.g. +1234567890"
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
+            }}
+            aria-invalid={!!errors.phone}
           />
         </div>
+        {errors.phone && (
+            <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1">
+              <span>🛑</span> {errors.phone}
+            </p>
+          )}
+        </div>
 
-        <span className="text-[11px] font-bold text-gray-300 tracking-widest mb-2 uppercase">Relationship</span>
-        <div className="flex flex-wrap gap-2 mb-10">
+        {/* Relationship Selector Container */}
+        <div className="flex flex-col mb-10">
+        <span className={`text-[11px] font-bold tracking-widest mb-2 uppercase ${errors.relationship ? "text-red-500" : "text-gray-400"}`}>
+          Relationship
+        </span>
+        <div className="flex flex-wrap gap-2">
           {relationships.map((item) => {
             const isSelected = relationship === item;
             return (
               <button
                 key={item}
-                onClick={() => setRelationship(item)}
+                onClick={() => {
+                  setRelationship(item);
+                  if (errors.relationship) setErrors((prev) => ({ ...prev, relationship: undefined })); // Real-time erasure
+                  }}
                 className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-colors flex-grow ${
                   isSelected 
                     ? "bg-black text-white border-black" 
@@ -106,6 +189,12 @@ export default function AddContactScreen() {
               </button>
             );
           })}
+        </div>
+        {errors.relationship && (
+            <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+              <span>🛑</span> {errors.relationship}
+            </p>
+          )}
         </div>
 
         <button
@@ -120,6 +209,5 @@ export default function AddContactScreen() {
           </span>
         </button>
       </div>
-    </div>
   );
 }
