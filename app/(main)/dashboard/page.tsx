@@ -23,10 +23,13 @@ type Contact = { id: string; name: string; phone: string };
 type AlertLog = { id: string; message: string; timestamp: any };
 type Location = { lat: number; lng: number } | null;
 
+export const metadata = {
+title: 'Dashboard',
+};
+
 export default function DashboardPage() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [alerts, setAlerts] = useState<AlertLog[]>([]);
   const [location, setLocation] = useState<Location>(null);
