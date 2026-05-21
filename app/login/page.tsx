@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+  general?: string;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,29 +19,60 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (): boolean => {
+    const tempErrors: FormErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email.trim()) {
+      tempErrors.email = "Email address is required.";
+    } else if (!emailRegex.test(email)) {
+      tempErrors.email = "Please enter a valid email address (e.g., name@example.com).";
+    }
+
+    if (!password) {
+      tempErrors.password = "Password is required.";
+    }
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
 
   const handleLogin = async () => {
-    setError("");
+    setErrors({});
 
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
-    }
+    // 1. Client-side validation run before hitting the API/Firebase
+    if (!validateForm()) return;
 
     setLoading(true);
 
     try {
       // 🔐 Firebase login
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-      // ✅ IMPORTANT: wait a tick so auth state updates
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 300);
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const userRole = userData.role;
+
+        setTimeout(() => {
+          if (userRole === "admin") {
+            router.push("/admin");
+          } else if (userRole === "user") {
+            router.push("/dashboard");
+          } 
+        }, 300);
+
+      } else {
+        setErrors({ general: "Account authenticated, but user profile was not found in the database." });
+        await auth.signOut(); 
+      }
 
     } catch (err: any) {
-      setError("Invalid email or password.");
+      setErrors({ general: "Incorrect email or password. Please check your credentials and try again." });
     } finally {
       setLoading(false);
     }
@@ -68,33 +106,64 @@ export default function LoginPage() {
         <h2 className="text-3xl font-bold text-center mb-10">Login</h2>
 
         {/* Error */}
-        {error && (
-          <div className="bg-red-500/10 text-red-400 p-3 rounded mb-4 text-sm">
-            {error}
+        {errors.general && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded mb-6 text-sm flex items-start gap-2 animate-fadeIn">
+            <span className="shrink-0">⚠️</span>
+            <span>{errors.general}</span>
           </div>
         )}
 
         {/* Email */}
-        <label className="text-xs font-semibold">Email</label>
+        <div className="mb-5">
+        <label className={`text-xs font-semibold ${errors.email ? "text-red-400" : "text-gray-300"}`}>
+          Email
+        </label>
         <input
-          className="w-full bg-transparent border-b border-gray-600 py-2 mb-6 outline-none"
+          className={`w-full bg-transparent border-b py-2 outline-none transition-colors duration-200 ${
+          errors.email ? "border-red-500 focus:border-red-400" : "border-gray-600 focus:border-white"
+          }`}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (errors.email) setErrors((prev) => ({ ...prev, email: "" })); // Clear error as they fix it
+            }}
+            aria-invalid={!!errors.email}
         />
+        {errors.email && (
+            <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1 animate-fadeIn">
+              <span>🛑</span> {errors.email}
+            </p>
+          )}
+        </div>
 
         {/* Password */}
-        <label className="text-xs font-semibold">Password</label>
+        <div className="mb-8 flex flex-col">
+        <label className={`text-xs font-semibold mb-1 ${errors.password ? "text-red-400" : "text-gray-300"}`}>
+          Password
+        </label>
         <input
           type="password"
-          className="w-full bg-transparent border-b border-gray-600 py-2 mb-8 outline-none"
+          className={`w-full bg-transparent border-b py-2 outline-none transition-colors duration-200 ${
+              errors.password ? "border-red-500 focus:border-red-400" : "border-gray-600 focus:border-white"
+            }`}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (errors.password) setErrors((prev) => ({ ...prev, password: undefined })); // Real-time clearing
+            }}
+            aria-invalid={!!errors.password}
         />
+        {errors.password && (
+            <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+              <span>🛑</span> {errors.password}
+            </p>
+          )}
+        </div>
 
         {/* Login Button */}
         <button
           onClick={handleLogin}
-          className="w-full bg-white text-black py-3 rounded font-semibold"
+          className="w-full bg-white text-black py-3 rounded font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
           disabled={loading}
         >
           {loading ? "Logging in..." : "Log In"}
@@ -106,7 +175,7 @@ export default function LoginPage() {
         </div>
 
         {/* Google Button */}
-        <button className="w-full border border-gray-700 py-3 rounded flex items-center justify-center gap-2">
+        <button className="w-full border border-gray-700 py-3 rounded flex items-center justify-center gap-2 hover:bg-zinc-900 transition-colors">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png"
             className="w-5 h-5"
@@ -118,7 +187,7 @@ export default function LoginPage() {
         <p className="text-center text-sm text-gray-400 mt-6">
           Don’t have an account?{" "}
           <span
-            className="text-white font-semibold cursor-pointer"
+            className="text-white font-semibold cursor-pointer hover:underline"
             onClick={() => router.push("/register")}
           >
             Create now
