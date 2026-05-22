@@ -58,13 +58,6 @@ export default function AddContactScreen() {
       </div>
 
       <div className="px-6 flex flex-col flex-grow">
-        
-        <button 
-          className="w-full bg-blue-500 text-white font-bold py-3 rounded-xl mb-6 shadow-sm hover:bg-blue-600 transition"
-          onClick={() => {}}
-        >
-          Import from Google Contacts
-        </button>
 
         <span className="text-[11px] font-bold text-gray-300 tracking-widest mb-2 uppercase">Full Name</span>
         <div className="flex items-center h-14 rounded-xl border border-gray-200 bg-gray-50 px-4 mb-6">

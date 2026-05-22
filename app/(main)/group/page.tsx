@@ -233,10 +233,6 @@ export default function GroupScreen() {
           </div>
 
           <div className="absolute bottom-0 w-full bg-white border-t p-3 flex items-center gap-2">
-            
-            <button className="w-10 h-10 flex items-center justify-center border rounded-full text-gray-600 hover:bg-gray-100" onClick={() => {}}>
-              📍
-            </button>
 
             <input
               type="text"
