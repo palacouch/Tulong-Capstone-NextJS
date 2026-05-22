@@ -1,13 +1,9 @@
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
-import { Metadata } from "next";
 
-export const metadata: Metadata = {
-title: {
-template: 'C.A.R.E | %s',
-default: 'C.A.R.E',
-},
-description: "Emergency Alert System",
+export const metadata = {
+  title: "Tulong 🚨",
+  description: "Emergency Alert System",
 };
 
 export default function RootLayout({
