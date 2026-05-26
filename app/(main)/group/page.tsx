@@ -27,6 +27,10 @@ function formatTime(ts) {
   return date.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: true });
 }
 
+export const metadata = {
+title: 'Group',
+};
+
 export default function GroupScreen() {
   const { user } = useAuth();
   const router = useRouter();
