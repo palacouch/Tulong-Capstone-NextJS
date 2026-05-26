@@ -248,8 +248,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="h-10" />
-
-        {/*<PrivacyConsentModal />*/}
-      </div>
-  );
+        <PrivacyConsentModal />
+</div>
+);
 }

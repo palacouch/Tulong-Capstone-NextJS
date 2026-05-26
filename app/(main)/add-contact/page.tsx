@@ -40,7 +40,16 @@ export default function AddContactScreen() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white font-sans animate-pulse">
+    <div
+  className="flex flex-col min-h-screen bg-white font-sans"
+  style={{
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // Semi-transparent white overlay
+    backgroundBlendMode: "overlay",
+  }}
+>
       
       <div className="absolute top-4 right-4 z-50">
         <span className="text-xs text-red-500 underline cursor-pointer">

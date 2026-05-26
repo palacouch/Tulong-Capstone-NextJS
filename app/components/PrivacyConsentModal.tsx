@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { useAuth } from "../context/AuthContext";
@@ -14,7 +12,6 @@ export default function PrivacyConsentModal() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    // This logic ensures the modal only shows if it's their first time!
     const checkConsent = () => {
       const localConsent = localStorage.getItem("tulong_privacy_consent");
       if (!localConsent) {
@@ -25,7 +22,6 @@ export default function PrivacyConsentModal() {
   }, []);
 
   const handleScroll = (e: any) => {
-    // Detects when the user scrolls to the bottom of the modal content
     const isAtBottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 20;
     if (isAtBottom) {
       setScrolled(true);
@@ -43,11 +39,10 @@ export default function PrivacyConsentModal() {
         version: "1.0",
         platform: "web",
       });
-      // Save to local storage so it never shows on this device again
       localStorage.setItem("tulong_privacy_consent", "true");
       setVisible(false);
     } catch (e) {
-    
+      console.error("Error saving consent:", e);
     } finally {
       setLoading(false);
     }
@@ -56,9 +51,7 @@ export default function PrivacyConsentModal() {
   if (!visible) return null;
 
   return (
-
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-pulse">
-      
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-[#13131f] border border-indigo-500/30 rounded-[24px] w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         
         {/* Header */}
@@ -72,23 +65,23 @@ export default function PrivacyConsentModal() {
 
         {/* Scrollable Content */}
         <div 
-          className="p-5 overflow-y-auto flex-1 flex flex-col gap-3"
+          className="p-5 overflow-y-auto flex-1 flex flex-col gap-3 custom-scrollbar"
           onScroll={handleScroll}
         >
-          <h3 className="text-indigo-500 text-[13px] font-bold tracking-wide uppercase mt-2 mb-1">
+          <h3 className="text-indigo-400 text-[13px] font-bold tracking-wide uppercase mt-2 mb-1">
             Republic Act No. 10173
           </h3>
           
-          <p className="text-zinc-800 text-[13px] leading-relaxed">
+          <p className="text-gray-300 text-[13px] leading-relaxed">
             In compliance with the Data Privacy Act of 2012 (RA 10173) of the Philippines,
             Tulong is committed to protecting and respecting your personal information.
             This notice explains how we collect, use, and store your data.
           </p>
 
-          <h3 className="text-indigo-500 text-[13px] font-bold tracking-wide uppercase mt-2 mb-1">
+          <h3 className="text-indigo-400 text-[13px] font-bold tracking-wide uppercase mt-2 mb-1">
             What data we collect
           </h3>
-          <ul className="text-zinc-800 text-[13px] leading-relaxed space-y-1 list-disc pl-5">
+          <ul className="text-gray-300 text-[13px] leading-relaxed space-y-1 list-disc pl-5">
             <li>Full name and email address provided during registration</li>
             <li>Real-time GPS location of the app user and IoT wearable device</li>
             <li>Emergency contact information (name, phone number, relationship)</li>
@@ -96,10 +89,10 @@ export default function PrivacyConsentModal() {
             <li>Device connection status and usage logs</li>
           </ul>
 
-          <h3 className="text-indigo-500 text-[13px] font-bold tracking-wide uppercase mt-2 mb-1">
+          <h3 className="text-indigo-400 text-[13px] font-bold tracking-wide uppercase mt-2 mb-1">
             How we store your data
           </h3>
-          <p className="text-zinc-800 text-[13px] leading-relaxed">
+          <p className="text-gray-300 text-[13px] leading-relaxed">
             Your data is stored securely using Google Firebase Firestore, a cloud-based
             database with industry-standard encryption. We do not sell, share, or
             disclose your personal information to third parties outside of the
@@ -107,10 +100,10 @@ export default function PrivacyConsentModal() {
           </p>
 
           <div className="mt-4 p-4 bg-white/5 rounded-lg flex flex-col gap-3">
-            <button onClick={() => {}} className="text-[12px] text-blue-400 underline text-left">
+            <button type="button" onClick={() => {}} className="text-[12px] text-blue-400 underline text-left hover:text-blue-300 transition-colors">
               Download Full Legal Document (PDF)
             </button>
-            <button onClick={() => {}} className="text-[12px] text-red-500 underline text-left">
+            <button type="button" onClick={() => {}} className="text-[12px] text-red-400 underline text-left hover:text-red-300 transition-colors">
               Request Permanent Data Deletion
             </button>
           </div>
@@ -123,7 +116,7 @@ export default function PrivacyConsentModal() {
         </div>
 
         {/* Footer & Consent Button */}
-        <div className="p-5 border-t border-white/5 flex flex-col gap-3">
+        <div className="p-5 border-t border-white/5 flex flex-col gap-3 bg-[#13131f]">
           <p className="text-white/35 text-[11px] text-center leading-relaxed">
             By clicking "I Agree & Give Consent" you acknowledge that you have read,
             understood, and agreed to the collection and use of your data as described above.
@@ -132,8 +125,8 @@ export default function PrivacyConsentModal() {
           <button
             className={`py-4 rounded-xl font-bold text-[15px] transition-all duration-300 ${
               !scrolled || loading 
-                ? "bg-indigo-500/30 text-white/50 cursor-not-allowed" 
-                : "bg-indigo-500 text-white shadow-[0_6px_12px_rgba(99,102,241,0.35)] hover:bg-indigo-600"
+                ? "bg-indigo-500/20 text-white/30 cursor-not-allowed" 
+                : "bg-indigo-600 text-white shadow-[0_6px_12px_rgba(79,70,229,0.4)] hover:bg-indigo-500 active:scale-[0.98]"
             }`}
             onClick={handleConsent}
             disabled={!scrolled || loading}
@@ -141,7 +134,6 @@ export default function PrivacyConsentModal() {
             {loading ? "Saving..." : scrolled ? "I Agree & Give Consent" : "Scroll to read first"}
           </button>
         </div>
-
       </div>
     </div>
   );
