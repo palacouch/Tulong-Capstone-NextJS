@@ -27,10 +27,6 @@ function formatTime(ts) {
   return date.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", hour12: true });
 }
 
-export const metadata = {
-title: 'Group',
-};
-
 export default function GroupScreen() {
   const { user } = useAuth();
   const router = useRouter();
@@ -148,6 +144,12 @@ export default function GroupScreen() {
       
       <div className="absolute top-4 right-4 z-50">
         <button className="text-xs text-red-500/80 hover:text-red-500 underline transition-colors">
+          Delete Account & Data
+        </button>
+      </div>
+
+      <div className="absolute top-4 right-4 z-50">
+        <button onClick={() => {}} className="text-xs text-red-500 underline cursor-pointer">
           Delete Account & Data
         </button>
       </div>
